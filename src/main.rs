@@ -1,17 +1,73 @@
 use macroquad::prelude::*;
 
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
+enum CellError {
+    AliveNeighborOverflow,
+    AliveNeighborUnderflow,
+    DeadCell,
+    AliveCell,
+}
+
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]
 enum CellState {
     Alive,
     Dead,
 }
 
+#[derive(Copy, Clone, Debug, PartialEq, Eq)]
+struct Cell {
+    pub state: CellState,
+    pub alive_neighbors: i32,
+}
+
+impl Cell {
+    pub fn give_life(&mut self) -> Result<(), CellError> {
+        if self.state == CellState::Alive {
+            Err(CellError::AliveCell)
+        } else {
+            self.state = CellState::Alive;
+            Ok(())
+        }
+    }
+
+    pub fn kill(&mut self) -> Result<(), CellError> {
+        if self.state == CellState::Dead {
+            Err(CellError::DeadCell)
+        } else {
+            self.state = CellState::Dead;
+            Ok(())
+        }
+    }
+
+    pub fn increase_alive_neighbors(&mut self) -> Result<(), CellError> {
+        if self.alive_neighbors < 8 {
+            self.alive_neighbors = self.alive_neighbors + 1;
+            Ok(())
+        } else {
+            Err(CellError::AliveNeighborOverflow)
+        }
+    }
+
+    pub fn decrease_alive_neighbors(&mut self) -> Result<(), CellError> {
+        if self.alive_neighbors > 0 {
+            self.alive_neighbors - 1;
+            Ok(())
+        } else {
+            Err(CellError::AliveNeighborUnderflow)
+        }
+    }
+}
 #[macroquad::main("Life")]
 async fn main() {
     let w = screen_width() as usize;
     let h = screen_height() as usize;
 
-    let mut cells = vec![vec![CellState::Dead; w]; h];
+    let init_cell = Cell {
+        state: CellState::Dead,
+        alive_neighbors: 0,
+    };
+
+    let mut cells = vec![vec![init_cell.clone(); w]; h];
     for row in cells.iter_mut() {
         for cell in row.iter_mut() {
             if rand::gen_range(0, 5) == 0 {

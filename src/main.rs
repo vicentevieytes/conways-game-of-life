@@ -9,7 +9,7 @@ async fn main() {
 
     let init_cell = Cell {
         state: CellState::Dead,
-        alive_neighbors: 0,
+        alive_neighbours: 0,
     };
 
     let mut cells = vec![vec![init_cell.clone(); w]; h];

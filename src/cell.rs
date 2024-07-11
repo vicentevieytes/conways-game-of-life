@@ -13,7 +13,7 @@ pub enum CellState {
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]
 pub struct Cell {
     pub state: CellState,
-    pub alive_neighbors: i32,
+    pub alive_neighbours: i32,
 }
 
 impl Cell {
@@ -25,26 +25,30 @@ impl Cell {
         self.state = CellState::Dead;
     }
 
-    pub fn increase_alive_neighbors(&mut self, num: i32) -> Result<(), CellError> {
-        if self.alive_neighbors + num > 8 {
+    pub fn increase_neighbours(&mut self, num: i32) -> Result<(), CellError> {
+        if self.alive_neighbours + num > 8 {
             Err(CellError::AliveNeighborOverflow)
         } else {
-            self.alive_neighbors = self.alive_neighbors + num;
+            self.alive_neighbours = self.alive_neighbours + num;
             Ok(())
         }
     }
 
-    pub fn decrease_alive_neighbors(&mut self, num: i32) -> Result<(), CellError> {
-        if self.alive_neighbors - num < 0 {
+    pub fn decrease_neighbours(&mut self, num: i32) -> Result<(), CellError> {
+        if self.alive_neighbours - num < 0 {
             Err(CellError::AliveNeighborUnderflow)
         } else {
-            self.alive_neighbors = self.alive_neighbors - num;
+            self.alive_neighbours = self.alive_neighbours - num;
             Ok(())
         }
     }
 
     pub fn is_alive(&self) -> bool {
         self.state == CellState::Alive
+    }
+
+    pub fn neighbours(&self) -> i32 {
+        self.alive_neighbours.clone()
     }
 }
 
@@ -55,13 +59,13 @@ mod tests {
     fn dead_cell() -> Cell {
         Cell {
             state: CellState::Dead,
-            alive_neighbors: 0,
+            alive_neighbours: 0,
         }
     }
     fn alive_cell() -> Cell {
         Cell {
             state: CellState::Alive,
-            alive_neighbors: 0,
+            alive_neighbours: 0,
         }
     }
 
@@ -92,36 +96,36 @@ mod tests {
     }
 
     #[test]
-    fn test_increase_alive_neighbors_within_limit() {
+    fn test_increase_neighbours_within_limit() {
         let mut cell = dead_cell();
-        let result = cell.increase_alive_neighbors(1);
+        let result = cell.increase_neighbours(1);
         assert!(result.is_ok());
-        assert_eq!(cell.alive_neighbors, 1);
+        assert_eq!(cell.alive_neighbours, 1);
     }
 
     #[test]
-    fn test_increase_alive_neighbors_overflow() {
+    fn test_increase_neighbours_overflow() {
         let mut cell = dead_cell();
-        let _ = cell.increase_alive_neighbors(8);
-        let result = cell.increase_alive_neighbors(1);
+        let _ = cell.increase_neighbours(8);
+        let result = cell.increase_neighbours(1);
         assert!(result.is_err());
-        assert_eq!(cell.alive_neighbors, 8); // Should not increase beyond 8
+        assert_eq!(cell.alive_neighbours, 8); // Should not increase beyond 8
     }
 
     #[test]
-    fn test_decrease_alive_neighbors_within_limit() {
+    fn test_decrease_neighbours_within_limit() {
         let mut cell = dead_cell();
-        let _ = cell.increase_alive_neighbors(5);
-        let result = cell.decrease_alive_neighbors(3);
+        let _ = cell.increase_neighbours(5);
+        let result = cell.decrease_neighbours(3);
         assert!(result.is_ok());
-        assert_eq!(cell.alive_neighbors, 2);
+        assert_eq!(cell.alive_neighbours, 2);
     }
 
     #[test]
-    fn test_decrease_alive_neighbors_underflow() {
+    fn test_decrease_neighbours_underflow() {
         let mut cell = dead_cell();
-        let result = cell.decrease_alive_neighbors(1);
+        let result = cell.decrease_neighbours(1);
         assert!(result.is_err());
-        assert_eq!(cell.alive_neighbors, 0); // Should not decrease below 0
+        assert_eq!(cell.alive_neighbours, 0); // Should not decrease below 0
     }
 }

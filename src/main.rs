@@ -42,6 +42,17 @@ async fn main() {
             draw_line(x, 0.0, x, screen_height, 1.0, BLACK);
         }
 
+        // Paint cells based on the cells matrix
+        for (row_index, row) in cells.iter().enumerate() {
+            for (col_index, &cell) in row.iter().enumerate() {
+                if cell == CellState::Alive {
+                    let x = col_index as f32 * grid_size;
+                    let y = row_index as f32 * grid_size;
+                    draw_rectangle(x, y, grid_size, grid_size, BLACK);
+                }
+            }
+        }
+
         next_frame().await;
     }
 }

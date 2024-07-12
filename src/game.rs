@@ -17,20 +17,23 @@ impl Game {
         let mut grid = vec![vec![Cell::new(); width]; height];
 
         for (cell_i, cell_j) in cells.iter() {
+            //Return error if the cell position is out of bounds
             if !Self::in_bounds(*cell_i, *cell_j, width, height) {
                 return Err(GameError::OutOfBoundsGridAccess((*cell_i, *cell_j)));
             }
-            let cell_row = *cell_i;
-            let cell_col = *cell_j;
-            grid[cell_row][cell_col].give_life();
+            //Otherwise, give life to the cell and return OK
+            grid[*cell_i][*cell_j].give_life();
         }
         let alive_cells = cells.clone();
+
         Ok(Game { grid, alive_cells })
     }
 
     pub fn next(&mut self) {
         let mut to_live = vec![];
         let mut to_die = vec![];
+        //Iterate over all cells in the grid counting live_neighbors, cells which need to die or
+        //be given life are pushed to the respective vectors.
         for (i, row) in self.grid.iter().enumerate() {
             for (j, cell) in row.iter().enumerate() {
                 let live_neighbors = self.live_neighbors((i, j));

@@ -6,10 +6,16 @@ pub enum CellState {
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]
 pub struct Cell {
-    pub state: CellState,
+    state: CellState,
 }
 
 impl Cell {
+    pub fn new() -> Self {
+        Cell {
+            state: CellState::Dead,
+        }
+    }
+
     pub fn give_life(&mut self) {
         self.state = CellState::Alive;
     }

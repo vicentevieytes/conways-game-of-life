@@ -5,13 +5,22 @@ use std::cmp::PartialOrd;
 
 pub type Position = (usize, usize);
 
+///Represents an instance of the Game of Life, it's generated with an initial state of living
+///cells, and it's state can be internally modified to be the next iteration of the game by just calling `next()`
 #[derive(Clone, Debug, PartialEq, Eq)]
-struct Game {
+pub struct Game {
     grid: Vec<Vec<Cell>>,
     alive_cells: Vec<Position>,
 }
 
 impl Game {
+    /// Arguments:
+    /// - `cells`, a list of initial living cells.
+    /// - `dimensions`, a (usize, usize) which indicates the size of the grid (width, height)
+    ///
+    /// Returns:
+    /// - An instance of Game with size `dimensions` and all cells in `living_cells` alive.
+    /// - An error if `cells` contains out of bound positions with respect to `dimensions`.
     pub fn from_cells(dimensions: Position, cells: &Vec<Position>) -> Result<Self, GameError> {
         let (width, height) = dimensions;
         let mut grid = vec![vec![Cell::new(); width]; height];
@@ -29,6 +38,12 @@ impl Game {
         Ok(Game { grid, alive_cells })
     }
 
+    /// Updates the internal state to represent the next step in the game according to the
+    /// following rules:
+    /// - Any live cell with fewer than two live neighbours dies, as if caused by underpopulation.
+    /// - Any live cell with two or three live neighbours lives on to the next generation.
+    /// - Any live cell with more than three live neighbours dies, as if by overpopulation.
+    /// - Any dead cell with exactly three live neighbours becomes a live cell, as if by reproduction.
     pub fn next(&mut self) {
         let mut to_live = vec![];
         let mut to_die = vec![];
@@ -50,16 +65,22 @@ impl Game {
                 }
             }
         }
-
-        for &(i, j) in to_die.iter() {
-            self.grid[i][j].kill();
-        }
-
-        for &(i, j) in to_live.iter() {
-            self.grid[i][j].give_life();
-        }
+        self.kill_list(&to_die);
+        self.give_life_list(&to_live);
 
         self.alive_cells = to_live;
+    }
+
+    fn kill_list(&mut self, list: &Vec<Position>) {
+        for &(i, j) in list.iter() {
+            self.grid[i][j].kill();
+        }
+    }
+
+    fn give_life_list(&mut self, list: &Vec<Position>) {
+        for &(i, j) in list.iter() {
+            self.grid[i][j].give_life();
+        }
     }
 
     fn live_neighbors(&self, position: Position) -> i32 {

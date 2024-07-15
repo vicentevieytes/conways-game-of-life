@@ -28,7 +28,10 @@ impl Game {
         for (cell_i, cell_j) in cells.iter() {
             //Return error if the cell position is out of bounds
             if !Self::in_bounds(*cell_i, *cell_j, width, height) {
-                return Err(GameError::OutOfBoundsGridAccess((*cell_i, *cell_j)));
+                return Err(GameError::OutOfBoundsGridAccess(
+                    (*cell_i, *cell_j),
+                    dimensions,
+                ));
             }
             //Otherwise, give life to the cell and return OK
             grid[*cell_i][*cell_j].give_life();
@@ -36,6 +39,16 @@ impl Game {
         let alive_cells = cells.clone();
 
         Ok(Game { grid, alive_cells })
+    }
+
+    //// Returns the vector of alive cells at the current iteration
+    pub fn alive_cells(&self) -> &Vec<Position> {
+        &self.alive_cells
+    }
+
+    /// Returns the width and height of the grid.
+    pub fn dimensions(&self) -> Position {
+        (self.grid.len(), self.grid[0].len())
     }
 
     /// Updates the internal state to represent the next step in the game according to the

@@ -22,19 +22,19 @@ impl Game {
     /// - An instance of Game with size `dimensions` and all cells in `living_cells` alive.
     /// - An error if `cells` contains out of bound positions with respect to `dimensions`.
     pub fn from_cells(dimensions: Position, cells: &Vec<Position>) -> Result<Self, GameError> {
-        let (width, height) = dimensions;
-        let mut grid = vec![vec![Cell::new(); width]; height];
+        let (rows, columns) = dimensions;
+        let mut grid = vec![vec![Cell::new(); columns]; rows];
 
-        for (cell_i, cell_j) in cells.iter() {
+        for (cell_row, cell_column) in cells.iter() {
             //Return error if the cell position is out of bounds
-            if !Self::in_bounds(*cell_i, *cell_j, width, height) {
+            if !Self::in_bounds(*cell_row, *cell_column, rows, columns) {
                 return Err(GameError::OutOfBoundsGridAccess(
-                    (*cell_i, *cell_j),
+                    (*cell_row, *cell_column),
                     dimensions,
                 ));
             }
             //Otherwise, give life to the cell and return OK
-            grid[*cell_i][*cell_j].give_life();
+            grid[*cell_row][*cell_column].give_life();
         }
         let alive_cells = cells.clone();
 
@@ -130,14 +130,14 @@ impl Game {
         let width = self.grid[0].len() as isize;
         let height = self.grid.len() as isize;
 
-        let (pos_i, pos_j) = position;
+        let (row, column) = position;
         let mut live_neighbors = 0;
         for &(dir_i, dir_j) in directions.iter() {
-            let neighbor_i = pos_i as isize + dir_i;
-            let neighbor_j = pos_j as isize + dir_j;
+            let neighbor_row = row as isize + dir_i;
+            let neighbor_column = column as isize + dir_j;
 
-            if Self::in_bounds(neighbor_i, neighbor_j, width, height)
-                && self.grid[neighbor_i as usize][neighbor_j as usize].is_alive()
+            if Self::in_bounds(neighbor_row, neighbor_column, height, width)
+                && self.grid[neighbor_row as usize][neighbor_column as usize].is_alive()
             {
                 live_neighbors += 1;
             }
@@ -145,11 +145,11 @@ impl Game {
         live_neighbors
     }
 
-    fn in_bounds<T>(i: T, j: T, w: T, h: T) -> bool
+    fn in_bounds<T>(row: T, column: T, height: T, width: T) -> bool
     where
         T: Num + PartialOrd,
     {
-        i >= T::zero() && j >= T::zero() && i < h && j < w
+        row >= T::zero() && column >= T::zero() && row < height && column < width
     }
 }
 

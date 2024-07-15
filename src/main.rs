@@ -66,7 +66,7 @@ async fn main() {
 
         if !running {
             draw_text("Click to toggle cells", 10.0, 20.0, 20.0, BLACK);
-            draw_text("Spacebar to start/pause", 10.0, 40.0, 20.0, BLACK);
+            draw_text("-click to start/pause", 10.0, 40.0, 20.0, BLACK);
             if is_key_pressed(KeyCode::Space) {
                 game.next();
             }

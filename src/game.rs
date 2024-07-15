@@ -41,17 +41,28 @@ impl Game {
         Ok(Game { grid, alive_cells })
     }
 
-    pub fn toggle_cell(&mut self, pos: (usize, usize)) {
+    /// Kills the cell if it's alive, gives life to it if it's dead.
+    pub fn toggle_cell(&mut self, pos: (usize, usize)) -> Result<(), GameError> {
+        if !Self::in_bounds(pos.0, pos.1, self.grid.len(), self.grid[0].len()) {
+            return Err(GameError::OutOfBoundsGridAccess(
+                (pos.0, pos.1),
+                (self.grid.len(), self.grid[0].len()),
+            ));
+        }
+
         let (i, j) = pos;
+
         let cell = &mut self.grid[i][j];
         if cell.is_alive() {
             cell.kill();
             if let Some(index) = self.alive_cells.iter().position(|value| *value == pos) {
                 self.alive_cells.swap_remove(index);
             }
+            return Ok(());
         } else {
             cell.give_life();
             self.alive_cells.push(pos);
+            return Ok(());
         }
     }
 

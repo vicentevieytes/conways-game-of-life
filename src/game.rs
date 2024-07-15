@@ -53,15 +53,21 @@ impl Game {
         let (i, j) = pos;
 
         let cell = &mut self.grid[i][j];
+
+        // Kills the cell, if it's on self.alive_cells, remove it.
         if cell.is_alive() {
             cell.kill();
             if let Some(index) = self.alive_cells.iter().position(|value| *value == pos) {
                 self.alive_cells.swap_remove(index);
             }
             return Ok(());
+
+        //Give life to the cell, if it's not on self.alive_cells, add it.
         } else {
             cell.give_life();
-            self.alive_cells.push(pos);
+            if !self.alive_cells.contains(&pos) {
+                self.alive_cells.push(pos)
+            };
             return Ok(());
         }
     }

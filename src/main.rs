@@ -56,7 +56,8 @@ async fn main() {
             let cell_x = (mouse_position.0 / grid_size).floor() as usize;
             let cell_y = (mouse_position.1 / grid_size).floor() as usize;
             if cell_x < width && cell_y < height {
-                game.toggle_cell((cell_x, cell_y));
+                game.toggle_cell((cell_x, cell_y))
+                    .expect("Error toggling cell");
             }
         }
         // Handle buttons
@@ -66,7 +67,7 @@ async fn main() {
 
         if !running {
             draw_text("Click to toggle cells", 10.0, 20.0, 20.0, BLACK);
-            draw_text("-click to start/pause", 10.0, 40.0, 20.0, BLACK);
+            draw_text("Spacebar to start/pause", 10.0, 40.0, 20.0, BLACK);
             if is_key_pressed(KeyCode::Space) {
                 game.next();
             }

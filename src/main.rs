@@ -11,14 +11,7 @@ async fn main() {
     let height = (screen_height / grid_size).ceil() as usize;
 
     // Create initial living cells
-    let mut initial_living_cells = Vec::new();
-    for x in 0..height {
-        for y in 0..width {
-            if rand::gen_range(0, 5) == 0 {
-                initial_living_cells.push((x, y));
-            }
-        }
-    }
+    let initial_living_cells = Vec::new();
 
     // Initialize the game
     let mut game = match Game::from_cells((width, height), &initial_living_cells) {
@@ -32,6 +25,8 @@ async fn main() {
     // Define grid parameters
     let horizontal_lines = height as i32;
     let vertical_lines = width as i32;
+
+    let mut running = false;
 
     loop {
         clear_background(WHITE);
@@ -55,8 +50,29 @@ async fn main() {
             draw_rectangle(x, y, grid_size, grid_size, BLACK);
         }
 
-        // Update the game state for the next frame
-        game.next();
+        // Handle mouse input
+        if is_mouse_button_pressed(MouseButton::Left) {
+            let mouse_position = mouse_position();
+            let cell_x = (mouse_position.0 / grid_size).floor() as usize;
+            let cell_y = (mouse_position.1 / grid_size).floor() as usize;
+            if cell_x < width && cell_y < height {
+                game.toggle_cell((cell_x, cell_y));
+            }
+        }
+        // Handle buttons
+        if is_key_pressed(KeyCode::Space) {
+            running = !running;
+        }
+
+        if !running {
+            draw_text("Click to toggle cells", 10.0, 20.0, 20.0, BLACK);
+            draw_text("Spacebar to start/pause", 10.0, 40.0, 20.0, BLACK);
+            if is_key_pressed(KeyCode::Space) {
+                game.next();
+            }
+        } else {
+            game.next();
+        }
 
         next_frame().await;
     }

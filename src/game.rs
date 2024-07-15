@@ -41,6 +41,20 @@ impl Game {
         Ok(Game { grid, alive_cells })
     }
 
+    pub fn toggle_cell(&mut self, pos: (usize, usize)) {
+        let (i, j) = pos;
+        let cell = &mut self.grid[i][j];
+        if cell.is_alive() {
+            cell.kill();
+            if let Some(index) = self.alive_cells.iter().position(|value| *value == pos) {
+                self.alive_cells.swap_remove(index);
+            }
+        } else {
+            cell.give_life();
+            self.alive_cells.push(pos);
+        }
+    }
+
     //// Returns the vector of alive cells at the current iteration
     pub fn alive_cells(&self) -> &Vec<Position> {
         &self.alive_cells

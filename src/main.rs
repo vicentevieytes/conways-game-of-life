@@ -12,8 +12,8 @@ async fn main() {
 
     // Create initial living cells
     let mut initial_living_cells = Vec::new();
-    for x in 0..width {
-        for y in 0..height {
+    for x in 0..height {
+        for y in 0..width {
             if rand::gen_range(0, 5) == 0 {
                 initial_living_cells.push((x, y));
             }

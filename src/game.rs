@@ -53,24 +53,29 @@ impl Game {
             for (j, cell) in row.iter().enumerate() {
                 let live_neighbors = self.live_neighbors((i, j));
 
-                if cell.is_alive() {
-                    if live_neighbors < 2 || live_neighbors > 3 {
-                        to_die.push((i, j));
-                    }
-                } else {
-                    //cell is dead
-                    if live_neighbors == 3 {
-                        to_live.push((i, j));
-                    }
+                if self.should_die(cell, live_neighbors) {
+                    to_die.push((i, j));
+                } else if self.should_live(cell, live_neighbors) {
+                    to_live.push((i, j));
                 }
             }
         }
+
         self.kill_list(&to_die);
         self.give_life_list(&to_live);
 
         self.alive_cells = to_live;
     }
 
+    // Function to determine if a live cell should die
+    fn should_die(&self, cell: &Cell, live_neighbors: usize) -> bool {
+        cell.is_alive() && (live_neighbors < 2 || live_neighbors > 3)
+    }
+
+    // Function to determine if a dead cell should come to life
+    fn should_live(&self, cell: &Cell, live_neighbors: usize) -> bool {
+        !cell.is_alive() && live_neighbors == 3
+    }
     fn kill_list(&mut self, list: &Vec<Position>) {
         for &(i, j) in list.iter() {
             self.grid[i][j].kill();
@@ -83,7 +88,7 @@ impl Game {
         }
     }
 
-    fn live_neighbors(&self, position: Position) -> i32 {
+    fn live_neighbors(&self, position: Position) -> usize {
         let directions = vec![
             (-1, -1),
             (-1, 0),

@@ -7,9 +7,8 @@ async fn main() {
     let w = screen_width() as usize;
     let h = screen_height() as usize;
 
-    let init_cell = Cell {
-        state: CellState::Dead,
-    };
+    //Cell::new() creates a dead cell
+    let init_cell = Cell::new();
 
     let mut cells = vec![vec![init_cell.clone(); w]; h];
     for row in cells.iter_mut() {

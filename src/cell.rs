@@ -1,15 +1,23 @@
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]
-pub enum CellState {
+enum CellState {
     Alive,
     Dead,
 }
 
+/// Represents a single cell in the game of life, it wraps a `CellState` enum and provides an api
+/// to check that state and modify it in place.
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]
 pub struct Cell {
-    pub state: CellState,
+    state: CellState,
 }
 
 impl Cell {
+    pub fn new() -> Self {
+        Cell {
+            state: CellState::Dead,
+        }
+    }
+
     pub fn give_life(&mut self) {
         self.state = CellState::Alive;
     }

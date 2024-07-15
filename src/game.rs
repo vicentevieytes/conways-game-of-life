@@ -76,6 +76,7 @@ impl Game {
     fn should_live(&self, cell: &Cell, live_neighbors: usize) -> bool {
         !cell.is_alive() && live_neighbors == 3
     }
+
     fn kill_list(&mut self, list: &Vec<Position>) {
         for &(i, j) in list.iter() {
             self.grid[i][j].kill();

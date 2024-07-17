@@ -69,7 +69,7 @@ impl Game {
     }
 
     /// Gives life to a list of cells
-    fn give_life_list(&mut self, list: &[Position]) -> Result<(), GameError> {
+    pub fn give_life_list(&mut self, list: &[Position]) -> Result<(), GameError> {
         for &pos in list.iter() {
             self.give_life(pos)?;
         }

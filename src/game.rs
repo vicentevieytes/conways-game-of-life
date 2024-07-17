@@ -25,7 +25,7 @@ impl Game {
     /// Initializes a game with set size and already alive cells
     pub fn from_size_and_cells(
         dimensions: Position,
-        cells: &Vec<Position>,
+        cells: &[Position],
     ) -> Result<Self, GameError> {
         let mut game = Game::of_size(dimensions);
         game.give_life_list(cells)?;
@@ -64,7 +64,7 @@ impl Game {
     }
 
     /// Kills a list of cells
-    pub fn kill_list(&mut self, list: &Vec<Position>) -> Result<(), GameError> {
+    pub fn kill_list(&mut self, list: &[Position]) -> Result<(), GameError> {
         for &pos in list.iter() {
             self.kill(pos)?;
         }
@@ -72,7 +72,7 @@ impl Game {
     }
 
     /// Gives life to a list of cells
-    fn give_life_list(&mut self, list: &Vec<Position>) -> Result<(), GameError> {
+    fn give_life_list(&mut self, list: &[Position]) -> Result<(), GameError> {
         for &pos in list.iter() {
             self.give_life(pos)?;
         }
@@ -120,7 +120,7 @@ impl Game {
 
     // Function to determine if a live cell should die
     fn should_die(&self, cell: &Cell, live_neighbors: usize) -> bool {
-        cell.is_alive() && (live_neighbors < 2 || live_neighbors > 3)
+        cell.is_alive() && !(2..=3).contains(&live_neighbors)
     }
 
     // Function to determine if a dead cell should come to life
@@ -129,7 +129,7 @@ impl Game {
     }
 
     fn live_neighbors(&self, position: Position) -> usize {
-        let directions = vec![
+        let directions = [
             (-1, -1),
             (-1, 0),
             (-1, 1),
@@ -160,12 +160,12 @@ impl Game {
     // Internal function to check if a Position is in bounds, returns error otherwise
     fn check_in_bounds(&self, pos: Position) -> Result<(), GameError> {
         if !Self::in_bounds(pos.0, pos.1, self.grid.len(), self.grid[0].len()) {
-            return Err(GameError::OutOfBoundsGridAccess(
+            Err(GameError::OutOfBoundsGridAccess(
                 (pos.0, pos.1),
                 (self.grid.len(), self.grid[0].len()),
-            ));
+            ))
         } else {
-            return Ok(());
+            Ok(())
         }
     }
 

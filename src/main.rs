@@ -1,4 +1,4 @@
-use conways_game_of_life::game::{Game, Position};
+use conways_game_of_life::game::Game;
 use macroquad::prelude::*;
 
 #[macroquad::main("Game of Life")]

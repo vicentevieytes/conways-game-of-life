@@ -2,7 +2,7 @@ use crate::cell::Cell;
 use crate::game_error::GameError;
 use num::traits::Num;
 use std::cmp::PartialOrd;
-
+use std::collections::HashSet;
 pub type Position = (usize, usize);
 
 ///Represents an instance of the Game of Life, it's generated with an initial state of living
@@ -10,7 +10,7 @@ pub type Position = (usize, usize);
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Game {
     grid: Vec<Vec<Cell>>,
-    alive_cells: Vec<Position>,
+    alive_cells: HashSet<Position>,
 }
 
 impl Game {
@@ -18,7 +18,7 @@ impl Game {
     pub fn of_size(dimensions: Position) -> Self {
         Game {
             grid: vec![vec![Cell::new(); dimensions.0]; dimensions.1],
-            alive_cells: vec![],
+            alive_cells: HashSet::new(),
         }
     }
 
@@ -46,9 +46,7 @@ impl Game {
         self.check_in_bounds(pos)?;
         let cell = &mut self.grid[pos.0][pos.1];
         cell.kill();
-        if let Some(index) = self.alive_cells.iter().position(|value| *value == pos) {
-            self.alive_cells.swap_remove(index);
-        }
+        self.alive_cells.remove(&pos);
         Ok(())
     }
 
@@ -57,9 +55,7 @@ impl Game {
         self.check_in_bounds(pos)?;
         let cell = &mut self.grid[pos.0][pos.1];
         cell.give_life();
-        if !self.alive_cells.contains(&pos) {
-            self.alive_cells.push(pos)
-        }
+        self.alive_cells.insert(pos);
         Ok(())
     }
 
@@ -80,7 +76,7 @@ impl Game {
     }
 
     /// Returns the vector of alive cells at the current iteration
-    pub fn alive_cells(&self) -> &Vec<Position> {
+    pub fn alive_cells(&self) -> &HashSet<Position> {
         &self.alive_cells
     }
 
@@ -114,8 +110,6 @@ impl Game {
 
         let _ = self.kill_list(&to_die);
         let _ = self.give_life_list(&to_live);
-
-        self.alive_cells = to_live;
     }
 
     // Function to determine if a live cell should die
@@ -192,7 +186,10 @@ mod tests {
         let mut grid = vec![vec![Cell::new(); 5]; 5];
         grid[1][1].give_life();
         grid[2][2].give_life();
-        let game_2 = Game { grid, alive_cells };
+        let game_2 = Game {
+            grid,
+            alive_cells: HashSet::from_iter(alive_cells),
+        };
 
         assert_eq!(game_1, game_2)
     }
@@ -205,7 +202,10 @@ mod tests {
         let mut grid = vec![vec![Cell::new(); 5]; 5];
         grid[1][1].give_life();
         grid[2][2].give_life();
-        let game_2 = Game { grid, alive_cells };
+        let game_2 = Game {
+            grid,
+            alive_cells: HashSet::from_iter(alive_cells),
+        };
 
         assert_eq!(game_1, game_2)
     }

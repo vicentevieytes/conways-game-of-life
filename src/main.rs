@@ -10,17 +10,8 @@ async fn main() {
     let width = (screen_width / grid_size).ceil() as usize;
     let height = (screen_height / grid_size).ceil() as usize;
 
-    // Create initial living cells
-    let initial_living_cells = Vec::new();
-
     // Initialize the game
-    let mut game = match Game::from_cells((width, height), &initial_living_cells) {
-        Ok(game) => game,
-        Err(e) => {
-            eprintln!("Failed to initialize the game: {:?}", e);
-            return;
-        }
-    };
+    let mut game = Game::of_size((width, height));
 
     // Define grid parameters
     let horizontal_lines = height as i32;

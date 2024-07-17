@@ -14,65 +14,62 @@ pub struct Game {
 }
 
 impl Game {
-    /// Arguments:
-    /// - `cells`, a list of initial living cells.
-    /// - `dimensions`, a (usize, usize) which indicates the size of the grid (width, height)
-    ///
-    /// Returns:
-    /// - An instance of Game with size `dimensions` and all cells in `living_cells` alive.
-    /// - An error if `cells` contains out of bound positions with respect to `dimensions`.
-    pub fn from_cells(dimensions: Position, cells: &Vec<Position>) -> Result<Self, GameError> {
-        let (rows, columns) = dimensions;
-        let mut grid = vec![vec![Cell::new(); columns]; rows];
-
-        for (cell_row, cell_column) in cells.iter() {
-            //Return error if the cell position is out of bounds
-            if !Self::in_bounds(*cell_row, *cell_column, rows, columns) {
-                return Err(GameError::OutOfBoundsGridAccess(
-                    (*cell_row, *cell_column),
-                    dimensions,
-                ));
-            }
-            //Otherwise, give life to the cell and return OK
-            grid[*cell_row][*cell_column].give_life();
+    /// Initializes a grid of height dimensions.0 and height dimensions.1
+    pub fn of_size(dimensions: Position) -> Self {
+        Game {
+            grid: vec![vec![Cell::new(); dimensions.0]; dimensions.1],
+            alive_cells: vec![],
         }
-        let alive_cells = cells.clone();
-
-        Ok(Game { grid, alive_cells })
     }
 
     /// Kills the cell if it's alive, gives life to it if it's dead.
     pub fn toggle_cell(&mut self, pos: (usize, usize)) -> Result<(), GameError> {
-        if !Self::in_bounds(pos.0, pos.1, self.grid.len(), self.grid[0].len()) {
-            return Err(GameError::OutOfBoundsGridAccess(
-                (pos.0, pos.1),
-                (self.grid.len(), self.grid[0].len()),
-            ));
-        }
-
-        let (i, j) = pos;
-
-        let cell = &mut self.grid[i][j];
-
-        // Kills the cell, if it's on self.alive_cells, remove it.
-        if cell.is_alive() {
-            cell.kill();
-            if let Some(index) = self.alive_cells.iter().position(|value| *value == pos) {
-                self.alive_cells.swap_remove(index);
-            }
-            return Ok(());
-
-        //Give life to the cell, if it's not on self.alive_cells, add it.
+        if self.alive_cells.contains(&pos) {
+            self.kill(pos)
         } else {
-            cell.give_life();
-            if !self.alive_cells.contains(&pos) {
-                self.alive_cells.push(pos)
-            };
-            return Ok(());
+            self.give_life(pos)
         }
     }
 
-    //// Returns the vector of alive cells at the current iteration
+    /// Kills a specific cell, returns error when out of bounds
+    pub fn kill(&mut self, pos: Position) -> Result<(), GameError> {
+        self.check_in_bounds(pos)?;
+        let cell = &mut self.grid[pos.0][pos.1];
+        cell.kill();
+        if let Some(index) = self.alive_cells.iter().position(|value| *value == pos) {
+            self.alive_cells.swap_remove(index);
+        }
+        Ok(())
+    }
+
+    /// Gives life to a specific cell, returns error when out of bounds
+    pub fn give_life(&mut self, pos: Position) -> Result<(), GameError> {
+        self.check_in_bounds(pos)?;
+        let cell = &mut self.grid[pos.0][pos.1];
+        cell.give_life();
+        if !self.alive_cells.contains(&pos) {
+            self.alive_cells.push(pos)
+        }
+        Ok(())
+    }
+
+    /// Kills a list of cells
+    pub fn kill_list(&mut self, list: &Vec<Position>) -> Result<(), GameError> {
+        for &pos in list.iter() {
+            self.kill(pos)?;
+        }
+        Ok(())
+    }
+
+    /// Gives life to a list of cells
+    fn give_life_list(&mut self, list: &Vec<Position>) -> Result<(), GameError> {
+        for &pos in list.iter() {
+            self.give_life(pos)?;
+        }
+        Ok(())
+    }
+
+    /// Returns the vector of alive cells at the current iteration
     pub fn alive_cells(&self) -> &Vec<Position> {
         &self.alive_cells
     }
@@ -121,18 +118,6 @@ impl Game {
         !cell.is_alive() && live_neighbors == 3
     }
 
-    fn kill_list(&mut self, list: &Vec<Position>) {
-        for &(i, j) in list.iter() {
-            self.grid[i][j].kill();
-        }
-    }
-
-    fn give_life_list(&mut self, list: &Vec<Position>) {
-        for &(i, j) in list.iter() {
-            self.grid[i][j].give_life();
-        }
-    }
-
     fn live_neighbors(&self, position: Position) -> usize {
         let directions = vec![
             (-1, -1),
@@ -160,6 +145,18 @@ impl Game {
             }
         }
         live_neighbors
+    }
+
+    // Internal function to check if a Position is in bounds, returns error otherwise
+    fn check_in_bounds(&self, pos: Position) -> Result<(), GameError> {
+        if !Self::in_bounds(pos.0, pos.1, self.grid.len(), self.grid[0].len()) {
+            return Err(GameError::OutOfBoundsGridAccess(
+                (pos.0, pos.1),
+                (self.grid.len(), self.grid[0].len()),
+            ));
+        } else {
+            return Ok(());
+        }
     }
 
     fn in_bounds<T>(row: T, column: T, height: T, width: T) -> bool

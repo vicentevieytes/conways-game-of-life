@@ -22,6 +22,16 @@ impl Game {
         }
     }
 
+    /// Initializes a game with set size and already alive cells
+    pub fn from_size_and_cells(
+        dimensions: Position,
+        cells: &Vec<Position>,
+    ) -> Result<Self, GameError> {
+        let mut game = Game::of_size(dimensions);
+        game.give_life_list(cells)?;
+        Ok(game)
+    }
+
     /// Kills the cell if it's alive, gives life to it if it's dead.
     pub fn toggle_cell(&mut self, pos: (usize, usize)) -> Result<(), GameError> {
         if self.alive_cells.contains(&pos) {
@@ -102,8 +112,8 @@ impl Game {
             }
         }
 
-        self.kill_list(&to_die);
-        self.give_life_list(&to_live);
+        let _ = self.kill_list(&to_die);
+        let _ = self.give_life_list(&to_live);
 
         self.alive_cells = to_live;
     }
@@ -171,16 +181,28 @@ impl Game {
 mod tests {
     use super::*;
 
-    fn game_grid_5_by_5() -> Vec<Vec<Cell>> {
-        vec![vec![Cell::new(); 5]; 5]
-    }
-
     #[test]
     fn test_initialize_game() {
         let alive_cells = vec![(1, 1), (2, 2)];
-        let game_1 = Game::from_cells((5, 5), &alive_cells).expect("Game returned error on init");
+        let mut game_1 = Game::of_size((5, 5));
+        game_1
+            .give_life_list(&alive_cells)
+            .expect("Game returned error on init");
 
-        let mut grid = game_grid_5_by_5();
+        let mut grid = vec![vec![Cell::new(); 5]; 5];
+        grid[1][1].give_life();
+        grid[2][2].give_life();
+        let game_2 = Game { grid, alive_cells };
+
+        assert_eq!(game_1, game_2)
+    }
+
+    #[test]
+    fn test_initialize_game_from_size_and_cells() {
+        let alive_cells = vec![(1, 1), (2, 2)];
+        let game_1 = Game::from_size_and_cells((5, 5), &alive_cells).unwrap();
+
+        let mut grid = vec![vec![Cell::new(); 5]; 5];
         grid[1][1].give_life();
         grid[2][2].give_life();
         let game_2 = Game { grid, alive_cells };
@@ -191,7 +213,7 @@ mod tests {
     #[test]
     fn test_initialize_game_with_oob_alive_cells_should_fail() {
         let alive_cells = vec![(3, 3)];
-        assert!(Game::from_cells((2, 2), &alive_cells).is_err());
+        assert!(Game::from_size_and_cells((2, 2), &alive_cells).is_err());
     }
 
     #[test]
@@ -206,70 +228,71 @@ mod tests {
             (2, 1),
             (2, 2),
         ]);
-        let game = Game::from_cells((4, 4), &cells).expect("Game returned error on init");
+        let game = Game::from_size_and_cells((4, 4), &cells).expect("Game returned error on init");
         assert_eq!(game.live_neighbors((1, 1)), 8)
     }
 
     #[test]
     fn test_upper_left_corner_live_neighbors() {
         let cells: Vec<Position> = Vec::from([(0, 1), (1, 0), (1, 1)]);
-        let game = Game::from_cells((4, 4), &cells).expect("Game returned error on init");
+        let game = Game::from_size_and_cells((4, 4), &cells).expect("Game returned error on init");
         assert_eq!(game.live_neighbors((0, 0)), 3)
     }
 
     #[test]
     fn test_upper_side_live_neighbors() {
         let cells: Vec<Position> = Vec::from([(0, 1), (1, 0), (1, 1), (1, 2)]);
-        let game = Game::from_cells((4, 4), &cells).expect("Game returned error on init");
+        let game = Game::from_size_and_cells((4, 4), &cells).expect("Game returned error on init");
         assert_eq!(game.live_neighbors((0, 2)), 3)
     }
 
     #[test]
     fn test_upper_right_corner_live_neighbors() {
         let cells: Vec<Position> = Vec::from([(0, 2), (1, 2), (1, 3)]);
-        let game = Game::from_cells((4, 4), &cells).expect("Game returned error on init");
+        let game = Game::from_size_and_cells((4, 4), &cells).expect("Game returned error on init");
         assert_eq!(game.live_neighbors((0, 3)), 3)
     }
 
     #[test]
     fn test_right_side_live_neighbors() {
         let cells: Vec<Position> = Vec::from([(1, 2), (2, 2), (3, 2)]);
-        let game = Game::from_cells((4, 4), &cells).expect("Game returned error on init");
+        let game = Game::from_size_and_cells((4, 4), &cells).expect("Game returned error on init");
         assert_eq!(game.live_neighbors((2, 3)), 3)
     }
 
     #[test]
     fn test_lower_right_corner_live_neighbors() {
         let cells: Vec<Position> = Vec::from([(2, 2), (2, 3), (3, 2)]);
-        let game = Game::from_cells((4, 4), &cells).expect("Game returned error on init");
+        let game = Game::from_size_and_cells((4, 4), &cells).expect("Game returned error on init");
         assert_eq!(game.live_neighbors((3, 3)), 3)
     }
 
     #[test]
     fn test_lower_side_live_neighbors() {
         let cells: Vec<Position> = Vec::from([(2, 1), (2, 2), (2, 3)]);
-        let game = Game::from_cells((4, 4), &cells).expect("Game returned error on init");
+        let game = Game::from_size_and_cells((4, 4), &cells).expect("Game returned error on init");
         assert_eq!(game.live_neighbors((3, 2)), 3)
     }
 
     #[test]
     fn test_lower_left_corner_live_neighbors() {
         let cells: Vec<Position> = Vec::from([(2, 0), (3, 1)]);
-        let game = Game::from_cells((4, 4), &cells).expect("Game returned error on init");
+        let game = Game::from_size_and_cells((4, 4), &cells).expect("Game returned error on init");
         assert_eq!(game.live_neighbors((3, 0)), 2)
     }
 
     #[test]
     fn test_left_side_live_neighbors() {
         let cells: Vec<Position> = Vec::from([(1, 1), (2, 1), (3, 1)]);
-        let game = Game::from_cells((4, 4), &cells).expect("Game returned error on init");
+        let game = Game::from_size_and_cells((4, 4), &cells).expect("Game returned error on init");
         assert_eq!(game.live_neighbors((2, 0)), 3)
     }
     #[test]
     fn test_underpopulation() {
         // Initialize a 4x4 grid with one cell alive
         let cells: Vec<Position> = Vec::from([(1, 1)]);
-        let mut game = Game::from_cells((4, 4), &cells).expect("Game returned error on init");
+        let mut game =
+            Game::from_size_and_cells((4, 4), &cells).expect("Game returned error on init");
 
         // Move to next generation
         game.next();
@@ -282,7 +305,8 @@ mod tests {
     fn test_survival() {
         // Initialize a 4x4 grid with three cells in a line (horizontal)
         let cells: Vec<Position> = Vec::from([(1, 0), (1, 1), (1, 2)]);
-        let mut game = Game::from_cells((4, 4), &cells).expect("Game returned error on init");
+        let mut game =
+            Game::from_size_and_cells((4, 4), &cells).expect("Game returned error on init");
 
         // Move to next generation
         game.next();
@@ -300,7 +324,8 @@ mod tests {
     fn test_overpopulation() {
         // Initialize a 4x4 grid with cells forming a small block
         let cells: Vec<Position> = Vec::from([(1, 1), (1, 2), (2, 1), (2, 2), (1, 0)]);
-        let mut game = Game::from_cells((4, 4), &cells).expect("Game returned error on init");
+        let mut game =
+            Game::from_size_and_cells((4, 4), &cells).expect("Game returned error on init");
 
         // Move to next generation
         game.next();
@@ -313,7 +338,8 @@ mod tests {
     fn test_reproduction() {
         // Initialize a 4x4 grid with three cells in a corner
         let cells: Vec<Position> = Vec::from([(0, 1), (1, 0), (1, 1)]);
-        let mut game = Game::from_cells((4, 4), &cells).expect("Game returned error on init");
+        let mut game =
+            Game::from_size_and_cells((4, 4), &cells).expect("Game returned error on init");
 
         // Move to next generation
         game.next();
@@ -326,7 +352,8 @@ mod tests {
     fn test_blinker_oscillator() {
         // Initialize a 5x5 grid with a blinker pattern (vertical line)
         let cells: Vec<Position> = Vec::from([(1, 2), (2, 2), (3, 2)]);
-        let mut game = Game::from_cells((5, 5), &cells).expect("Game returned error on init");
+        let mut game =
+            Game::from_size_and_cells((5, 5), &cells).expect("Game returned error on init");
 
         // Move to next generation
         game.next();
@@ -344,7 +371,8 @@ mod tests {
     fn test_multiple_steps() {
         // Initialize a 5x5 grid with a blinker pattern (vertical line)
         let cells: Vec<Position> = Vec::from([(1, 2), (2, 2), (3, 2)]);
-        let mut game = Game::from_cells((5, 5), &cells).expect("Game returned error on init");
+        let mut game =
+            Game::from_size_and_cells((5, 5), &cells).expect("Game returned error on init");
 
         // First step: The blinker should turn into a horizontal line
         game.next();

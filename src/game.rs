@@ -14,7 +14,7 @@ pub struct Game {
 }
 
 impl Game {
-    /// Initializes a grid of height dimensions.0 and height dimensions.1
+    /// Initializes a grid of height dimensions.0 and width dimensions.1
     pub fn of_size(dimensions: Position) -> Self {
         let (height, width) = dimensions;
         Game {

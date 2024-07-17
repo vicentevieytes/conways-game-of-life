@@ -25,10 +25,11 @@ async fn main() {
         if !running {
             draw_text("Click to toggle cells", 10.0, 20.0, 20.0, BLACK);
             draw_text("Spacebar to start/pause", 10.0, 40.0, 20.0, BLACK);
+            draw_text("R to reset the board", 10.0, 60.0, 20.0, BLACK);
         } else {
             game.next();
         }
-
+        std::thread::sleep(std::time::Duration::from_millis(20));
         next_frame().await;
     }
 }
@@ -71,5 +72,9 @@ fn handle_input(game: &mut Game, grid_size: f32, width: usize, height: usize, ru
     // Handle space key input
     if is_key_pressed(KeyCode::Space) {
         *running = !*running;
+    }
+    // Handle space key input
+    if is_key_pressed(KeyCode::R) {
+        game.genocide();
     }
 }

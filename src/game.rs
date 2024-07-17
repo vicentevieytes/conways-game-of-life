@@ -76,6 +76,12 @@ impl Game {
         Ok(())
     }
 
+    pub fn genocide(&mut self) {
+        for pos in self.alive_cells().clone() {
+            self.kill(pos)
+                .expect("Shouldn't panic because all alive_cells should be in-bounds")
+        }
+    }
     /// Returns the vector of alive cells at the current iteration
     pub fn alive_cells(&self) -> &HashSet<Position> {
         &self.alive_cells

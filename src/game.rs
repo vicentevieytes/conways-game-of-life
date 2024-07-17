@@ -307,7 +307,7 @@ mod tests {
         game.next();
 
         // The single live cell should die due to underpopulation
-        assert!(!game.grid[1][1].is_alive());
+        assert!(!game.is_alive((1, 1)));
     }
 
     #[test]
@@ -321,12 +321,12 @@ mod tests {
         game.next();
 
         // The three cells should rearrange to a vertical line
-        assert!(game.grid[0][1].is_alive());
-        assert!(game.grid[1][1].is_alive());
-        assert!(game.grid[2][1].is_alive());
+        assert!(game.is_alive((0, 1)));
+        assert!(game.is_alive((1, 1)));
+        assert!(game.is_alive((2, 1)));
 
-        assert!(!game.grid[1][0].is_alive());
-        assert!(!game.grid[1][2].is_alive());
+        assert!(!game.is_alive((1, 0)));
+        assert!(!game.is_alive((1, 2)));
     }
 
     #[test]
@@ -340,7 +340,7 @@ mod tests {
         game.next();
 
         // The cell at (1, 1) should die due to overpopulation
-        assert!(!game.grid[1][1].is_alive());
+        assert!(!game.is_alive((1, 1)));
     }
 
     #[test]
@@ -354,7 +354,7 @@ mod tests {
         game.next();
 
         // The dead cell at (0, 0) should come to life due to reproduction
-        assert!(game.grid[0][0].is_alive());
+        assert!(game.is_alive((0, 0)));
     }
 
     #[test]
@@ -368,12 +368,12 @@ mod tests {
         game.next();
 
         // The blinker should turn into a horizontal line
-        assert!(game.grid[2][1].is_alive());
-        assert!(game.grid[2][2].is_alive());
-        assert!(game.grid[2][3].is_alive());
+        assert!(game.is_alive((2, 1)));
+        assert!(game.is_alive((2, 2)));
+        assert!(game.is_alive((2, 3)));
 
-        assert!(!game.grid[1][2].is_alive());
-        assert!(!game.grid[3][2].is_alive());
+        assert!(!game.is_alive((1, 2)));
+        assert!(!game.is_alive((3, 2)));
     }
 
     #[test]
@@ -385,29 +385,29 @@ mod tests {
 
         // First step: The blinker should turn into a horizontal line
         game.next();
-        assert!(game.grid[2][1].is_alive());
-        assert!(game.grid[2][2].is_alive());
-        assert!(game.grid[2][3].is_alive());
+        assert!(game.is_alive((2, 1)));
+        assert!(game.is_alive((2, 2)));
+        assert!(game.is_alive((2, 3)));
 
-        assert!(!game.grid[1][2].is_alive());
-        assert!(!game.grid[3][2].is_alive());
+        assert!(!game.is_alive((1, 2)));
+        assert!(!game.is_alive((3, 2)));
 
         // Second step: The blinker should return to a vertical line
         game.next();
-        assert!(game.grid[1][2].is_alive());
-        assert!(game.grid[2][2].is_alive());
-        assert!(game.grid[3][2].is_alive());
+        assert!(game.is_alive((1, 2)));
+        assert!(game.is_alive((2, 2)));
+        assert!(game.is_alive((3, 2)));
 
-        assert!(!game.grid[2][1].is_alive());
-        assert!(!game.grid[2][3].is_alive());
+        assert!(!game.is_alive((2, 1)));
+        assert!(!game.is_alive((2, 3)));
 
         // Third step: The blinker should turn into a horizontal line again
         game.next();
-        assert!(game.grid[2][1].is_alive());
-        assert!(game.grid[2][2].is_alive());
-        assert!(game.grid[2][3].is_alive());
+        assert!(game.is_alive((2, 1)));
+        assert!(game.is_alive((2, 2)));
+        assert!(game.is_alive((2, 3)));
 
-        assert!(!game.grid[1][2].is_alive());
-        assert!(!game.grid[3][2].is_alive());
+        assert!(!game.is_alive((1, 2)));
+        assert!(!game.is_alive((3, 2)));
     }
 }

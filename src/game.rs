@@ -5,8 +5,8 @@ use std::cmp::PartialOrd;
 use std::collections::HashSet;
 pub type Position = (usize, usize);
 
-///Represents an instance of the Game of Life, it's generated with an initial state of living
-///cells, and it's state can be internally modified to be the next iteration of the game by just calling `next()`
+///Represents an instance of the Game of Life on a fixed size grid. Each of the cells can be killed or given life to
+///and it's state can be modified to be the next iteration of the game by just calling `next()`
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Game {
     grid: Vec<Vec<Cell>>,

@@ -16,8 +16,9 @@ pub struct Game {
 impl Game {
     /// Initializes a grid of height dimensions.0 and height dimensions.1
     pub fn of_size(dimensions: Position) -> Self {
+        let (height, width) = dimensions;
         Game {
-            grid: vec![vec![Cell::new(); dimensions.0]; dimensions.1],
+            grid: vec![vec![Cell::new(); width]; height],
             alive_cells: HashSet::new(),
         }
     }

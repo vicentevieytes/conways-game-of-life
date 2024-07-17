@@ -86,6 +86,11 @@ impl Game {
         (self.grid.len(), self.grid[0].len())
     }
 
+    /// Returns a boolean indicating if the cell in the position is alive or not
+    pub fn is_alive(&self, pos: Position) -> bool {
+        self.alive_cells().contains(&pos)
+    }
+
     /// Updates the internal state to represent the next step in the game according to the
     /// following rules:
     /// - Any live cell with fewer than two live neighbours dies, as if caused by underpopulation.
@@ -123,6 +128,8 @@ impl Game {
         !cell.is_alive() && live_neighbors == 3
     }
 
+    // Returns the ammount of live neighbors of a certain position, used to decide wether a cell
+    // lives or dies when next() is called
     fn live_neighbors(&self, position: Position) -> usize {
         let directions = [
             (-1, -1),
@@ -134,8 +141,8 @@ impl Game {
             (1, 0),
             (1, 1),
         ];
-        let width = self.grid[0].len() as isize;
-        let height = self.grid.len() as isize;
+        let height = self.dimensions().0 as isize;
+        let width = self.dimensions().1 as isize;
 
         let (row, column) = position;
         let mut live_neighbors = 0;
@@ -154,10 +161,11 @@ impl Game {
 
     // Internal function to check if a Position is in bounds, returns error otherwise
     fn check_in_bounds(&self, pos: Position) -> Result<(), GameError> {
-        if !Self::in_bounds(pos.0, pos.1, self.grid.len(), self.grid[0].len()) {
+        let (height, width) = self.dimensions();
+        if !Self::in_bounds(pos.0, pos.1, height, width) {
             Err(GameError::OutOfBoundsGridAccess(
                 (pos.0, pos.1),
-                (self.grid.len(), self.grid[0].len()),
+                (height, width),
             ))
         } else {
             Ok(())

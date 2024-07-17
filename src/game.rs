@@ -76,6 +76,7 @@ impl Game {
         Ok(())
     }
 
+    /// Kills every cell in the board
     pub fn genocide(&mut self) {
         for pos in self.alive_cells().clone() {
             self.kill(pos)
@@ -87,7 +88,7 @@ impl Game {
         &self.alive_cells
     }
 
-    /// Returns the width and height of the grid.
+    /// Returns the height and width of the grid.
     pub fn dimensions(&self) -> Position {
         (self.grid.len(), self.grid[0].len())
     }

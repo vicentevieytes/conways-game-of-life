@@ -3,7 +3,7 @@ use std::{error::Error, fmt};
 
 #[derive(Debug)]
 pub enum GameError {
-    OutOfBoundsGridAccess(Position),
+    OutOfBoundsGridAccess(Position, Position),
 }
 
 impl Error for GameError {}

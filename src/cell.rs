@@ -11,6 +11,12 @@ pub struct Cell {
     state: CellState,
 }
 
+impl Default for Cell {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Cell {
     pub fn new() -> Self {
         Cell {

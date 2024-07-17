@@ -1,3 +1,5 @@
+![license](https://img.shields.io/github/license/vicentevieytes/conways-game-of-life)
+
 # John Conway's Game of Life
 
 The universe of the Game of Life is an infinite two-dimensional orthogonal grid of square cells, each of which is in one of two possible states, alive or dead, or "populated" or "unpopulated". Every cell interacts with its eight neighbours, which are the cells that are horizontally, vertically, or diagonally adjacent. At each step in time, the following transitions occur:
